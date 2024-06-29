@@ -7,6 +7,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+// 使用bean的方式，声明交换机、队列和他们的绑定关系
 // spring在读取到这些配置后，会向rabbitmq发送请求，创建这些交换机和队列；
 // 因此，项目启动后们就可以在rabbitmq的页面上看到这些资源；
 @Configuration

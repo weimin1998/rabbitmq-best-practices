@@ -96,7 +96,25 @@ public class ProducerController {
     @GetMapping("/sendToFanoutExchange")
     public String sendToFanoutExchange(@RequestParam(required = false, defaultValue = "hello, everyone!") String msg) {
         String exchange = "fanout.exchange";
-        rabbitTemplate.convertAndSend(exchange,"",msg);
+        rabbitTemplate.convertAndSend(exchange, "", msg);
+        return "发送成功";
+    }
+
+
+    // http://localhost:8080/producer/sendToDirectExchange
+    // 消息生产者，使用spring-amqp 发送消息到交换机
+    // direct exchange
+    @GetMapping("/sendToDirectExchange")
+    public String sendToDirectExchange() throws InterruptedException {
+        String exchange = "direct.exchange";
+        String message1 = "hello, blue";
+        String message2 = "hello, yellow";
+        String message3 = "hello, red";
+        rabbitTemplate.convertAndSend(exchange, "blue", message1);
+        Thread.sleep(10);
+        rabbitTemplate.convertAndSend(exchange, "yellow", message2);
+        Thread.sleep(10);
+        rabbitTemplate.convertAndSend(exchange, "red", message3);
         return "发送成功";
     }
 }
