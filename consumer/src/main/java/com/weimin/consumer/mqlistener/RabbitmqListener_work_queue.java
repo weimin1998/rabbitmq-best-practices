@@ -1,4 +1,4 @@
-package com.weimin.consumer.mqconfig;
+package com.weimin.consumer.mqlistener;
 
 
 import org.slf4j.Logger;

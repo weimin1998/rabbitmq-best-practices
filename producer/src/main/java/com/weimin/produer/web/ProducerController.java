@@ -67,7 +67,7 @@ public class ProducerController {
     // 消息生产者，使用spring-amqp 发送消息到队列
     // simple queue
     @GetMapping("/sendSimpleMsg_amqp")
-    public String simpleAmqp(@RequestParam(required = false, defaultValue = "hello, spring amqp!") String msg) throws IOException, TimeoutException {
+    public String simpleAmqp(@RequestParam(required = false, defaultValue = "hello, spring amqp!") String msg) {
         String queueName = "simple.queue";
         rabbitTemplate.convertAndSend(queueName, msg);
         logger.info("发送消息：" + msg);
@@ -76,10 +76,10 @@ public class ProducerController {
 
 
     // http://localhost:8080/producer/sendWorkQueue
-    // 消息生产者，使用java api 发送消息到队列
+    // 消息生产者，使用spring-amqp 发送消息到队列
     // work queue
     @GetMapping("/sendWorkQueue")
-    public String sendWorkQueue(@RequestParam(required = false, defaultValue = "hello, spring amqp!") String msg) throws IOException, TimeoutException, InterruptedException {
+    public String sendWorkQueue(@RequestParam(required = false, defaultValue = "hello, spring amqp!") String msg) throws InterruptedException {
         String queueName = "work.queue";
 
         // 每隔20ms发送一条消息，1s钟发送50条
@@ -87,6 +87,16 @@ public class ProducerController {
             rabbitTemplate.convertAndSend(queueName, msg + "_" + i);
             Thread.sleep(20);
         }
+        return "发送成功";
+    }
+
+    // http://localhost:8080/producer/sendToFanoutExchange
+    // 消息生产者，使用spring-amqp 发送消息到交换机
+    // fanout exchange
+    @GetMapping("/sendToFanoutExchange")
+    public String sendToFanoutExchange(@RequestParam(required = false, defaultValue = "hello, everyone!") String msg) {
+        String exchange = "fanout.exchange";
+        rabbitTemplate.convertAndSend(exchange,"",msg);
         return "发送成功";
     }
 }
