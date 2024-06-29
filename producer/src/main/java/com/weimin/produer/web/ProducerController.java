@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 @RestController
@@ -134,6 +136,20 @@ public class ProducerController {
         rabbitTemplate.convertAndSend(exchange, "china.weather", message2);
         Thread.sleep(10);
         rabbitTemplate.convertAndSend(exchange, "japan.news", message3);
+        return "发送成功";
+    }
+
+
+    // http://localhost:8080/producer/sendObjectMsg
+    // 消息生产者，使用spring-amqp 发送消息到队列
+    // 这次发送的消息类型是java对象
+    @GetMapping("/sendObjectMsg")
+    public String sendObjectMsg() {
+
+        String queue = "object.queue";
+        Map<String,String> map = new HashMap<>();
+        map.put("name","weimin");
+        rabbitTemplate.convertAndSend(queue,map);
         return "发送成功";
     }
 }
