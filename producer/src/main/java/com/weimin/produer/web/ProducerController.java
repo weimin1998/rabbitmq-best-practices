@@ -117,4 +117,23 @@ public class ProducerController {
         rabbitTemplate.convertAndSend(exchange, "red", message3);
         return "发送成功";
     }
+
+    // http://localhost:8080/producer/sendToTopicExchange
+    // 消息生产者，使用spring-amqp 发送消息到交换机
+    // topic exchange
+    @GetMapping("/sendToTopicExchange")
+    public String sendToTopicExchange() throws InterruptedException {
+        String exchange = "topic.exchange";
+        String message1 = "中国新闻";
+        String message2 = "中国天气";
+        String message3 = "日本新闻";
+
+        // topic交换机，routingkey必须是多个单词，并且以点分隔
+        rabbitTemplate.convertAndSend(exchange, "china.news", message1);
+        Thread.sleep(10);
+        rabbitTemplate.convertAndSend(exchange, "china.weather", message2);
+        Thread.sleep(10);
+        rabbitTemplate.convertAndSend(exchange, "japan.news", message3);
+        return "发送成功";
+    }
 }
