@@ -3,16 +3,23 @@ package com.weimin.produer.web;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 @RestController
 @RequestMapping("/producer")
 public class ProducerController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProducerController.class);
 
     // http://localhost:8080/producer/sendSimpleMsg
     // 消息生产者，使用java api 发送消息到队列
@@ -49,6 +56,37 @@ public class ProducerController {
         channel.close();
         connection.close();
 
+        return "发送成功";
+    }
+
+
+    @Resource
+    RabbitTemplate rabbitTemplate;
+
+    // http://localhost:8080/producer/sendSimpleMsg_amqp
+    // 消息生产者，使用spring-amqp 发送消息到队列
+    // simple queue
+    @GetMapping("/sendSimpleMsg_amqp")
+    public String simpleAmqp(@RequestParam(required = false, defaultValue = "hello, spring amqp!") String msg) throws IOException, TimeoutException {
+        String queueName = "simple.queue";
+        rabbitTemplate.convertAndSend(queueName, msg);
+        logger.info("发送消息：" + msg);
+        return "发送成功";
+    }
+
+
+    // http://localhost:8080/producer/sendWorkQueue
+    // 消息生产者，使用java api 发送消息到队列
+    // work queue
+    @GetMapping("/sendWorkQueue")
+    public String sendWorkQueue(@RequestParam(required = false, defaultValue = "hello, spring amqp!") String msg) throws IOException, TimeoutException, InterruptedException {
+        String queueName = "work.queue";
+
+        // 每隔20ms发送一条消息，1s钟发送50条
+        for (int i = 1; i <= 50; i++) {
+            rabbitTemplate.convertAndSend(queueName, msg + "_" + i);
+            Thread.sleep(20);
+        }
         return "发送成功";
     }
 }
